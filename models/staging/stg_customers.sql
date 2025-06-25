@@ -1,7 +1,2 @@
-SELECT
-  customer_id,
-  first_name,
-  last_name,
-  email,
-  phone
-FROM {{ ref('customers') }}
+
+SELECT * FROM {{ ref('raw_customers') }}
