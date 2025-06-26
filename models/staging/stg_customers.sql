@@ -1,7 +1,7 @@
 SELECT
-  customer_id,
-  first_name,
-  last_name,
-  email,
-  phone
-FROM {{ ref('customers') }}
+  Customer_Id AS customer_id,
+  First_Name AS first_name,
+  Last_Name AS last_name,
+  Country AS country,
+  Phone_1 AS phone_1
+FROM {{ ref('raw_customers') }}

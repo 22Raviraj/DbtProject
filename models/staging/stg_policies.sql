@@ -1,7 +1,1 @@
-SELECT
-  policy_id,
-  customer_id,
-  start_date,
-  end_date,
-  premium
-FROM {{ ref('policies') }}
+SELECT * FROM {{ ref('raw_policies') }}  
