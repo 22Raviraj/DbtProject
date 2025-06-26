@@ -1,4 +1,4 @@
-Customer_Id,First_Name,Last_Name,Country,Phone
+Customer_Id,First_Name,Last_Name,Country,Phone_1
 1,John,Doe,USA,555-1234
 2,Jane,Smith,Canada,555-5678
 3,Jim,Beam,USA,1234567890

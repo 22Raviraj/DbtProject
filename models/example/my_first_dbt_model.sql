@@ -6,6 +6,7 @@
 
     Try changing "table" to "view" below
 */
+-- depends_on: {{ ref('audit_log') }}
 
 {{ config(materialized='table') }}
 
