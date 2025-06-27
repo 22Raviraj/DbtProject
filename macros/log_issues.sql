@@ -17,7 +17,7 @@
       '{{ invocation }}',
       '{{ model_name }}',
       '{{ severity_level }}',
-      '{{ issue_message | replace("'", "") }}',
+      '{{ issue_message | replace("'", "''") }}',
       current_timestamp()
     )
   {% endset %}
@@ -25,13 +25,15 @@
   {% do run_query(sql) %}
 {% endmacro %}
 
+
 {% macro log_model_event(event_name) %}
   {% do log_issue('job_run', 'info', event_name) %}
 {% endmacro %}
 
+
 {% macro log_run_end_results(results) %}
   {% for result in results %}
-    {% set model_name = result.node.unique_id %}
+    {% set model_name = result.node.name %}
     {% set status = result.status %}
     {% set message = result.message if result.message else '' %}
     {% do log_issue(model_name, status, message) %}
