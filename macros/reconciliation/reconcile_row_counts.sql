@@ -1,15 +1,42 @@
-{% macro reconcile_row_counts(this_model, source_model) %}
-  {% set source_sql %}SELECT COUNT(*) FROM {{ ref(source_model) }}{% endset %}
-  {% set target_sql %}SELECT COUNT(*) FROM {{ this_model }}{% endset %}
+{% macro reconcile_row_counts(this_model_ref, source_model_ref) %}
+  {% set invocation_id_val = invocation_id %}
 
-  {% set source_result = run_query(source_sql) %}
-  {% set target_result = run_query(target_sql) %}
+  {% set src_sql %}SELECT COUNT(*) AS cnt FROM {{ source_model_ref }}{% endset %}
+  {% set tgt_sql %}SELECT COUNT(*) AS cnt FROM {{ this_model_ref }}{% endset %}
 
-  {% if source_result and target_result %}
-    {% set source_count = source_result.columns[0].values()[0] %}
-    {% set target_count = target_result.columns[0].values()[0] %}
-    {% do log_reconciliation_result(this_model.identifier, source_model, source_count, target_count) %}
+  {% set src_result = run_query(src_sql) %}
+  {% set tgt_result = run_query(tgt_sql) %}
+
+  {% if src_result and tgt_result %}
+    {% set src_count = src_result.columns[0].values()[0] %}
+    {% set tgt_count = tgt_result.columns[0].values()[0] %}
+
+    {{ log("📊 Source count: " ~ src_count ~ " | Target count: " ~ tgt_count, info=True) }}
+
+    {% if src_count is not none and tgt_count is not none %}
+      {% set status = "pass" if src_count == tgt_count else "fail" %}
+      {% set msg = "Source: " ~ src_count ~ ", Target: " ~ tgt_count %}
+
+      {% set insert_sql %}
+        INSERT INTO CORE.reconciliation_log (
+          MODEL_NAME, SOURCE_TABLE, SOURCE_COUNT, TARGET_COUNT,
+          STATUS, RUN_INVOCATION_ID, CHECKED_AT
+        )
+        VALUES (
+          '{{ this_model_ref.identifier }}',
+          '{{ source_model_ref.identifier }}',
+          {{ src_count }},
+          {{ tgt_count }},
+          '{{ status }}',
+          '{{ invocation_id_val }}',
+          CURRENT_TIMESTAMP()
+        )
+      {% endset %}
+
+      {{ log("📝 Inserting into reconciliation_log: " ~ insert_sql, info=True) }}
+      {% do run_query(insert_sql) %}
+    {% endif %}
   {% else %}
-    {{ log("⚠️ Could not retrieve source/target counts for reconciliation.", info=True) }}
+    {{ log("⚠️ Skipping reconciliation — one of the counts is missing", info=True) }}
   {% endif %}
 {% endmacro %}

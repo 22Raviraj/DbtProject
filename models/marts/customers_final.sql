@@ -1,6 +1,6 @@
 {{ config(
   materialized='table',
-  post_hook=["{{ reconcile_row_counts(this.name, 'stg_customers') }}"]
+  post_hook=[reconcile_row_counts(this, ref('stg_customers'))]
 ) }}
 
 WITH base AS (
@@ -8,4 +8,3 @@ WITH base AS (
 )
 
 SELECT * FROM base
-
