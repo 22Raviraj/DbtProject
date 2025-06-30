@@ -1,0 +1,136 @@
+version: 2
+
+models:
+  - name: my_first_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+
+  - name: my_second_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_customers
+    description: "Customer information table"
+    columns:
+      - name: Customer_Id
+        description: "Primary key for customers"
+        tests:
+          - unique:
+              severity: error
+          - not_null:
+              severity: error
+
+      - name: First_Name
+        description: "Customer's first name"
+        tests:
+          - not_null:
+              severity: warn
+
+      - name: Last_Name
+        description: "Customer's last name"
+        tests:
+          - not_null:
+              severity: warn
+
+      - name: Country
+        description: "Country should not be null or empty"
+        tests:
+          - not_null:
+              severity: warn
+
+      - name: Phone_1
+        description: "Basic phone format check"
+        tests:
+          - not_null:
+              severity: warn
+
+  - name: stg_policies
+    description: "Policy details linked to customers"
+    columns:
+      - name: Policy_Id
+        description: "Primary key for policies"
+        tests:
+          - unique:
+              severity: error
+          - not_null:
+              severity: error
+
+      - name: Customer_Id
+        description: "FK to customers"
+        tests:
+          - not_null:
+              severity: error
+          - relationships:
+              to: ref('customers')
+              field: Customer_Id
+              severity: error
+
+      - name: Premium_Amount
+        description: "Should be greater than zero"
+        tests:
+          - not_null:
+              severity: error
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              severity: warn
+
+  - name: stg_claims
+    description: "Claim data linked to policies"
+    columns:
+      - name: Claim_Id
+        description: "Primary key for claims"
+        tests:
+          - unique:
+              severity: error
+          - not_null:
+              severity: error
+
+      - name: Policy_Id
+        description: "FK to policies"
+        tests:
+          - not_null:
+              severity: error
+          - relationships:
+              to: ref('policies')
+              field: Policy_Id
+              severity: error
+
+      - name: Claim_Amount
+        description: "Must be positive"
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+              severity: warn
+
+      - name: Status
+        description: "Should be one of approved, rejected, pending"
+        tests:
+          - accepted_values:
+              values: ["Approved", "Rejected", "Pending"]
+              severity: warn
+
+  - name: claim_fact
+    description: "Final model combining customer, policy, and claims data"
+    columns:
+      - name: Claim_Id
+        tests:
+          - not_null
+          - unique
+
+      - name: Customer_Id
+        tests:
+          - not_null
+
+      - name: Policy_Id
+        tests:
+          - not_null
