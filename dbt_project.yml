@@ -46,6 +46,8 @@ models:
       +materialized: table
     audit:
       +materialized: table
+    marts:
+      +post-hook: "{{ reconcile_row_counts(this, 'stg_' ~ this.identifier) }}"
       
 on-run-start:
   - "{{ log_model_event('run_start') }}"
