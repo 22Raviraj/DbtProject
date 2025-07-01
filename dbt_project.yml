@@ -40,8 +40,9 @@ models:
   my_new_project:
     example:
       +materialized: table
-    Tests:
-      +materialized: table
+    tests:
+      +materialized: ephemeral
+      
     staging:
       +materialized: table
     audit:
