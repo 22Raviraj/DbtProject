@@ -26,9 +26,12 @@
 {% endmacro %}
 
 
+
 {% macro log_model_event(event_name) %}
-  {% do log_issue('job_run', 'info', event_name) %}
+  {% set model_name = model.name if execute else 'unknown' %}
+  {% do log_issue(model_name, 'info', event_name) %}
 {% endmacro %}
+
 
 
 {% macro log_run_end_results(results) %}

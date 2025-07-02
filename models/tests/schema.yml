@@ -54,6 +54,9 @@ models:
           - not_null:
               severity: warn
 
+  
+          
+
   - name: stg_policies
     description: "Policy details linked to customers"
     columns:
@@ -83,6 +86,16 @@ models:
           - dbt_utils.expression_is_true:
               expression: "> 0"
               severity: warn
+
+    tests:
+      - record_count:
+          compare_model: ref('claim_fact')
+          where_condition:
+            base: "Premium_Amount > 0"
+            target: "Policy_Id IS NOT NULL"
+          count_multiplier:
+            base: 1
+            target: 1
 
   - name: stg_claims
     description: "Claim data linked to policies"
@@ -119,6 +132,16 @@ models:
               values: ["Approved", "Rejected", "Pending"]
               severity: warn
 
+    tests:
+      - record_count:
+          compare_model: ref('claim_fact')
+          where_condition:
+            base: "Claim_Amount > 0"
+            target: "Claim_Id IS NOT NULL"
+          count_multiplier:
+            base: 1
+            target: 1
+
   - name: claim_fact
     description: "Final model combining customer, policy, and claims data"
     columns:
@@ -134,3 +157,13 @@ models:
       - name: Policy_Id
         tests:
           - not_null
+
+    tests:
+      - record_count:
+          compare_model: ref('stg_claims')
+          where_condition:
+            base: "Status IS NOT NULL"
+            target: "Status IS NOT NULL"
+          count_multiplier:
+            base: 1
+            target: 1
