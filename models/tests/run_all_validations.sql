@@ -1,19 +1,15 @@
-{{ log_model_event('validations_start') }}
+select * from (
+  {{ assert_column_not_null('stg_customers', 'customer_id') }}
+) as not_null_check
 
-SELECT * FROM (
-    {{ assert_column_not_null('stg_customers', 'customer_id') }}
-) AS not_null_check
+union all
 
-UNION ALL
+select * from (
+  {{ assert_column_unique('stg_customers', 'customer_id') }}
+) as unique_check
 
-SELECT * FROM (
-    {{ assert_column_unique('stg_customers', 'customer_id') }}
-) AS unique_check
+union all
 
-UNION ALL
-
-SELECT * FROM (
-    {{ expect_column_values_to_be_in_list('stg_customers', 'country', ["'US'", "'CA'", "'IN'"]) }}
-) AS value_check
-
-{{ log_model_event('validations_end') }}
+select * from (
+  {{ expect_column_values_to_be_in_list('stg_customers', 'country', ["'USA'", "'Canada'", "'India'"]) }}
+) as value_check
