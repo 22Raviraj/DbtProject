@@ -19,7 +19,6 @@
             from {{ compare_model }} {{ target_where_builder }}
           {% endif %}
         ),
-
         compare_model as (
           {% if source_custom_query | length %}
             select count as count_b from ( {{ source_custom_query }} )
@@ -28,12 +27,10 @@
             from {{ model }} {{ source_where_builder }}
           {% endif %}
         ),
-
         combined as (
           select base_model.count_a, compare_model.count_b
           from base_model, compare_model
         )
-
       select
         count_a,
         count_b,
@@ -47,7 +44,6 @@
       from combined
     {% endset %}
 
-    -- ✅ Write to audit_log
     {% set audit_insert %}
       insert into MAGMUTUAL_INSURANCE.CORE.audit_log (
         run_invocation_id,
@@ -68,7 +64,6 @@
     {% endset %}
     {% do run_query(audit_insert) %}
 
-    -- ❌ Fail build by triggering division-by-zero
     {% set fail_check %}
       with check_cte as (
         {{ validation_cte }}
