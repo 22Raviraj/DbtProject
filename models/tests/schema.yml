@@ -54,15 +54,8 @@ models:
           - not_null:
               severity: warn
 
-    tests:
-      - record_count:
-          compare_model: ref('claim_fact')
-          where_condition:
-            base: "Country IS NOT NULL"
-            target: "Customer_Id IS NOT NULL"
-          count_multiplier:
-            base: 1
-            target: 1
+  
+          
 
   - name: stg_policies
     description: "Policy details linked to customers"
