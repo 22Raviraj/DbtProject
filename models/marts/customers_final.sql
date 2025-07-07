@@ -9,7 +9,7 @@
 ) }}
 
 WITH base AS (
-  SELECT * FROM {{ ref('raw_customers') }} 
+  SELECT * FROM {{ ref('stg_customers') }} 
 )
 
 SELECT * FROM base
