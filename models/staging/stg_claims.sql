@@ -4,6 +4,6 @@
 ) }}
 
 SELECT * FROM {{ ref('raw_claims') }}  
-SELECT * FROM {{ ref('raw_claims') }}  
+ 
 
 
